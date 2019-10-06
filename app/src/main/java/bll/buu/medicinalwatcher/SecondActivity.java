@@ -1,16 +1,20 @@
 package bll.buu.medicinalwatcher;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ListView;
+import android.widget.SearchView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,6 +39,8 @@ public class SecondActivity extends AppCompatActivity {
     FrameLayout linearLayout;
     LoadingDialog loadingDialog;
     FloatingActionButton floatingActionButton;
+    SearchManager searchManager;
+    SearchView searchView;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -56,7 +62,10 @@ public class SecondActivity extends AppCompatActivity {
                                     AlertDialog.Builder builder = new AlertDialog.Builder(SecondActivity.this);
                                     builder.setTitle("检索成功！").setMessage("条形码：" + getdata.getString("bar_code") + "\n"
                                             + "药品名称:" + getdata.getString("item_name") + "\n"
-                                            + "剩余数量" + getdata.getString("item_count")).show();
+                                            + "剩余数量" + getdata.getString("item_count")+"\n"
+                                                    +"药品到期时间："+getdata.getString("time_limit")+"\n"
+                                                    +"药物功能："+getdata.getString("med_function"))
+                                    .show();
 
                                 }
                                 else{
@@ -74,10 +83,71 @@ public class SecondActivity extends AppCompatActivity {
 
         }
     }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_search, menu);
+        searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView =
+                (SearchView) menu.findItem(R.id.ab_search).getActionView();
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(final String s) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            final ArrayList datas= getNamebySymbol(connection,s);
+                            if(datas!=null && datas.size()>=1){
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(SecondActivity.this);
+                                        builder.setTitle("成功获取结果");
+                                        builder.setMessage("适用于"+s+"的药物有："+
+                                                datas.toString());
+                                        builder.show();
+                                    }
+                                });
+                            }else{
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(SecondActivity.this);
+                                        builder.setTitle("没有结果");
+                                        builder.setMessage("没有找到适用于"+s
+                                                +"的药物！");
+                                        builder.show();
+                                    }
+                                });
+                            }
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(final String s) {
+
+                return false;
+            }
+        });
+        return true;
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
+
         floatingActionButton = findViewById(R.id.floatbutton);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,7 +205,9 @@ loadingDialog.dismiss();
 
                                                          builder.setMessage("条形码：" + allinfo[1] + "\n"
                                                                  + "药品名称:" + allinfo[0] + "\n"
-                                                                 + "剩余数量" + allinfo[2]);
+                                                                 + "剩余数量:" + allinfo[2]+"\n"
+                                                         +"药品到期时间："+allinfo[3]+"\n"
+                                                         +"药物功能："+allinfo[4]);
                                                          builder.show();
                                                      }
                                                  });
@@ -193,6 +265,8 @@ loadingDialog.dismiss();
                 bundle.putString("bar_code", rs.getString("bar_code"));
                 bundle.putString("item_name", rs.getString("item_name"));
                 bundle.putString("item_count", rs.getString("item_count"));
+                bundle.putString("time_limit",rs.getString("time_limit"));
+                bundle.putString("med_function",rs.getString("med_function"));
 //                Message msg = new Message();
 //                msg.setData(bundle);
                // myHandler.sendMessage(msg);
@@ -204,7 +278,7 @@ loadingDialog.dismiss();
     }
 
     public String[] getItemInfoByItemName(Connection con1, String name) throws SQLException {
-       String []data = new String[3];
+       String []data = new String[5];
 
             String sql = "select * from shopinfo where item_name= '" + name + "'";        //查询表名为“user”的所有内容
             Statement stmt = con1.createStatement();        //创建Statement
@@ -213,6 +287,8 @@ loadingDialog.dismiss();
                data[0]=name;
                data[1]=rs.getString("bar_code");
                data[2]=rs.getString("item_count");
+               data[3]=rs.getString("time_limit");
+               data[4]=rs.getString("med_function");
             }
 
             rs.close();
@@ -240,6 +316,26 @@ loadingDialog.dismiss();
 
         return namelist;
     }
+
+    public ArrayList getNamebySymbol(Connection con1,String symbol) throws SQLException {
+        ArrayList namelist = new ArrayList();
+        String sql = "select item_name from shopinfo where med_function LIKE '%" +
+               symbol +"%';";        //查询表名为“user”的所有内容
+        Statement stmt = con1.createStatement();        //创建Statement
+        ResultSet rs = stmt.executeQuery(sql);          //ResultSet类似Cursor
+        while (rs.next()) {
+            namelist.add(rs.getString("item_name"));
+
+        }
+        //<code>ResultSet</code>最初指向第一行
+
+
+        rs.close();
+        stmt.close();
+
+        return namelist;
+    }
+
 
 //
 //    public String[] finditeminfo(String code) {
