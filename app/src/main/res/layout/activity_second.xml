@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/mylist"/>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_gravity="end|bottom"
@@ -21,6 +22,19 @@ android:foregroundGravity="center"
         android:layout_marginBottom="20dp"
         android:layout_marginRight="20dp"
         android:src="@drawable/ic_scan"
+        app:pressedTranslationZ="12dp"
+        android:layout_height="wrap_content" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:id="@+id/floatbutton2"
+        android:foregroundGravity="center"
+        android:clickable="true"
+        app:borderWidth="0dp"
+        app:backgroundTint="#56abe4"
+        android:layout_marginBottom="90dp"
+        android:layout_marginRight="20dp"
+        android:src="@drawable/ic_alarm"
         app:pressedTranslationZ="12dp"
         android:layout_height="wrap_content" />
 </FrameLayout>

@@ -33,6 +33,44 @@
 <!--                <action android:name="android.intent.action.SEARCH" />-->
 <!--            </intent-filter>-->
         </activity>
+        <activity
+            android:name=".activity.AddAlarmActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="@string/title_activity_add_alarm">
+        </activity>
+        <activity
+            android:name=".activity.EditAlarmActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="@string/title_activity_edit_alarm">
+        </activity>
+        <activity
+            android:name=".activity.QuestionActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="设置问题">
+        </activity>
+        <activity
+            android:name=".activity.AlarmActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="勤补水忌辛辣合理安排作息时间">
+        </activity>
+        <receiver android:name=".MyAlarmReceiver"/>
+
+        <receiver android:name=".SnoozeReceiver"/>
+
+        <activity android:name=".activity.PlayAlarmActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+        android:launchMode="singleTask"/>
+
+        <activity android:name=".activity.AboutActivity"/>
+
+        <service android:name=".AlarmService"/>
+
+        <receiver android:name=".AlarmService$RebootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
         <activity android:name=".BarCodeTestActivity"
             android:configChanges="orientation|keyboardHidden"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"

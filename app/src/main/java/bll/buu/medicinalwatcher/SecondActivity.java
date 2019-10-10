@@ -28,6 +28,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import bll.buu.medicinalwatcher.activity.AlarmActivity;
 import bll.buu.medicinalwatcher.activity.CaptureActivity;
 
 
@@ -38,7 +39,7 @@ public class SecondActivity extends AppCompatActivity {
     private Connection connection = null;
     FrameLayout linearLayout;
     LoadingDialog loadingDialog;
-    FloatingActionButton floatingActionButton;
+    FloatingActionButton floatingActionButton,floatingActionButton2;
     SearchManager searchManager;
     SearchView searchView;
 
@@ -149,6 +150,14 @@ public class SecondActivity extends AppCompatActivity {
         setContentView(R.layout.activity_second);
 
         floatingActionButton = findViewById(R.id.floatbutton);
+        floatingActionButton2 = findViewById(R.id.floatbutton2);
+        floatingActionButton2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent it = new Intent(SecondActivity.this, AlarmActivity.class);
+                startActivity(it);
+            }
+        });
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
