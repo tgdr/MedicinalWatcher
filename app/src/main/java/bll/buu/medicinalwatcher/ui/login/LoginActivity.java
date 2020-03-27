@@ -24,17 +24,23 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import bll.buu.medicinalwatcher.MedApplication;
 import bll.buu.medicinalwatcher.R;
 import bll.buu.medicinalwatcher.SecondActivity;
+import bll.buu.medicinalwatcher.activity.NavigationActivity;
+import bll.buu.medicinalwatcher.activity.RegisterActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
     private LoginViewModel loginViewModel;
-
+    private Button bt_login_register;
+    MedApplication application;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        bt_login_register = findViewById(R.id.bt_login_register);
+        application = (MedApplication) getApplication();
         loginViewModel = ViewModelProviders.of(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
 if(ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
@@ -45,41 +51,38 @@ if(ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.CAM
         final EditText passwordEditText = findViewById(R.id.password);
         final Button loginButton = findViewById(R.id.login);
         final ProgressBar loadingProgressBar = findViewById(R.id.loading);
-
-        loginViewModel.getLoginFormState().observe(this, new Observer<LoginFormState>() {
-            @Override
-            public void onChanged(@Nullable LoginFormState loginFormState) {
-                if (loginFormState == null) {
-                    return;
-                }
-                loginButton.setEnabled(loginFormState.isDataValid());
-                if (loginFormState.getUsernameError() != null) {
-                    usernameEditText.setError(getString(loginFormState.getUsernameError()));
-                }
-                if (loginFormState.getPasswordError() != null) {
-                    passwordEditText.setError(getString(loginFormState.getPasswordError()));
-                }
+        bt_login_register.setOnClickListener(view -> {
+            Intent it = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(it);
+        });
+        loginViewModel.getLoginFormState().observe(this, loginFormState -> {
+            if (loginFormState == null) {
+                return;
+            }
+            loginButton.setEnabled(loginFormState.isDataValid());
+            if (loginFormState.getUsernameError() != null) {
+                usernameEditText.setError(getString(loginFormState.getUsernameError()));
+            }
+            if (loginFormState.getPasswordError() != null) {
+                passwordEditText.setError(getString(loginFormState.getPasswordError()));
             }
         });
 
-        loginViewModel.getLoginResult().observe(this, new Observer<LoginResult>() {
-            @Override
-            public void onChanged(@Nullable LoginResult loginResult) {
-                if (loginResult == null) {
-                    return;
-                }
-                loadingProgressBar.setVisibility(View.GONE);
-                if (loginResult.getError() != null) {
-                    showLoginFailed(loginResult.getError());
-                }
-                if (loginResult.getSuccess() != null) {
-                    updateUiWithUser(loginResult.getSuccess());
-                }
-                setResult(Activity.RESULT_OK);
-
-                //Complete and destroy login activity once successful
-                finish();
+        loginViewModel.getLoginResult().observe(this, loginResult -> {
+            if (loginResult == null) {
+                return;
             }
+            loadingProgressBar.setVisibility(View.GONE);
+            if (loginResult.getError() != null) {
+                showLoginFailed(loginResult.getError());
+            }
+            if (loginResult.getSuccess() != null) {
+                updateUiWithUser(loginResult.getSuccess());
+            }
+            setResult(Activity.RESULT_OK);
+
+            //Complete and destroy login activity once successful
+            finish();
         });
 
         TextWatcher afterTextChangedListener = new TextWatcher() {
@@ -91,6 +94,17 @@ if(ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.CAM
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 // ignore
+                if(usernameEditText.getText().toString()!=null &&  !usernameEditText.getText().toString().equals("") && passwordEditText.getText().toString()!=null && !passwordEditText.getText().toString().equals("")){
+                    loginButton.setBackgroundResource(R.drawable.bg_login_submit);
+                    loginButton.setTextColor(getResources().getColor(R.color.white));
+                    loginButton.setClickable(true);
+                }
+                else {
+                    loginButton.setBackgroundResource(R.drawable.bg_login_submit_lock);
+                    loginButton.setTextColor(getResources().getColor(R.color.account_lock_font_color));
+                    loginButton.setClickable(false);
+                }
+
             }
 
             @Override
@@ -117,11 +131,17 @@ if(ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.CAM
             @Override
             public void onClick(View v) {
             //    loadingProgressBar.setVisibility(View.VISIBLE);
-                if(usernameEditText.getText().toString().equals("123123")&&passwordEditText.getText().toString().equals("123456")){
-                    Intent it =new Intent(LoginActivity.this, SecondActivity.class);
+                if(usernameEditText.getText().toString().equals("liangl")&&passwordEditText.getText().toString().equals("123456")){
+                    Intent it =new Intent(LoginActivity.this, NavigationActivity.class);
                     startActivity(it);
                     finish();
             }
+                else if(application.getSpf().getString("userName","1")!=null && application.getSpf().getString("userName","1").equals(usernameEditText.getText().toString()) &&
+                application.getSpf().getString("passWord","1")!=null && application.getSpf().getString("passWord","1").equals(passwordEditText.getText().toString())){
+                    Intent it =new Intent(LoginActivity.this, NavigationActivity.class);
+                    startActivity(it);
+                    finish();
+                }
                 else{
                     Toast.makeText(LoginActivity.this,"用户名或密码输入错误！",Toast.LENGTH_SHORT).show();
                 }
@@ -138,5 +158,11 @@ if(ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.CAM
 
     private void showLoginFailed(@StringRes Integer errorString) {
         Toast.makeText(getApplicationContext(), errorString, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
     }
 }

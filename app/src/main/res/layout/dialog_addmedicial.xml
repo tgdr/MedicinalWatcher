@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:layout_height="match_parent">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+>
+        <TextView
+            android:layout_marginTop="5dp"
+            android:textColor="#ff000000"
+            android:textSize="20dp"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="条形码" />
+        <TextView
+            android:layout_marginTop="5dp"
+            android:textColor="#ffff0000"
+            android:textSize="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/txt_barcode_scan_result"
+            android:layout_weight="9"
+            android:text="未检测" />
+
+        <Button
+            android:layout_weight="1"
+            android:id="@+id/btn_scan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="5dp"
+            android:text="自动识别" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        <TextView
+        
+            android:textColor="#ff000000"
+            android:textSize="20dp"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="药品名称" />
+        <EditText
+
+            android:textSize="15dp"
+            android:maxLength="30"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/edit_item_name"
+            android:layout_weight="9"
+            android:hint="请输入药品名称"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        <TextView
+            android:layout_marginTop="10dp"
+            android:textColor="#ff000000"
+            android:textSize="20dp"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="对应症状" />
+        <EditText
+            android:layout_marginTop="10dp"
+            android:textSize="15dp"
+            android:maxLength="100"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/edit_item_symbol"
+            android:layout_weight="9"
+            android:hint="请输入治疗的症状"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="horizontal"
+
+        >
+        <TextView
+            android:layout_marginTop="5dp"
+            android:textColor="#ff000000"
+            android:textSize="20dp"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="请选择数量" />
+<TextView
+    android:layout_marginTop="5dp"
+    android:id="@+id/txtdialog"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="3"
+    android:text="N/A"/>
+        <TextView
+            android:layout_marginTop="5dp"
+            android:textColor="#ff000000"
+            android:textSize="20dp"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="盒" />
+
+    </LinearLayout>
+    <TextView
+        android:layout_marginTop="5dp"
+       android:layout_gravity="center"
+        android:textColor="#ff000000"
+        android:textSize="20dp"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="请选择药品到期时间" />
+    <CalendarView
+        
+        android:foregroundGravity="center"
+        android:layout_gravity="center"
+        android:id="@+id/limit_picker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:id="@+id/bt_submit"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginLeft="24dp"
+
+        android:layout_marginRight="24dp"
+        android:background="@drawable/bg_login_submit"
+        android:elevation="0dp"
+        android:outlineProvider="none"
+        android:text="提交"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_18"
+        tools:targetApi="lollipop" />
+
+</LinearLayout>

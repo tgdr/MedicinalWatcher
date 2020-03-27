@@ -61,8 +61,6 @@ public class AddAlarmActivity extends AppCompatActivity implements
     private MediaPlayer player ;
     private MyAlarmDataBase db ;
 
-
-
     private static final String KEY_TITLE = "title_key";
     private static final String KEY_TIME = "time_key";
     private static final String KEY_REPEAT = "repeat_key";
@@ -471,6 +469,8 @@ public class AddAlarmActivity extends AppCompatActivity implements
                     mTitleText.setError("闹钟名不能为空");
                 else {
                     saveAlarm();
+                    Intent it = new Intent(AddAlarmActivity.this,NavigationActivity.class);
+                    startActivity(it);
                     finish();
                 }
                 return true;

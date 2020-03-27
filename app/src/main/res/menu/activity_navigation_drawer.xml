@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_scan"
+            android:icon="@drawable/ic_scan"
+            android:title="@string/menu_scan" />
+        <item
+            android:id="@+id/nav_alarm"
+            android:icon="@drawable/ic_alarm"
+            android:title="@string/menu_Alarm" />
+        <item
+            android:id="@+id/nav_addcase"
+            android:icon="@drawable/ic_icon_medc"
+            android:title="@string/menu_addcase" />
+        <item
+            android:id="@+id/nav_suggestion"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="@string/menu_suggestion" />
+<!--        <item-->
+<!--            android:id="@+id/nav_queryresult"-->
+<!--            android:icon="@drawable/ic_queryresult"-->
+<!--            android:title="查看申报" />-->
+    </group>
+
+    <item android:title="账户相关">
+        <menu>
+            <item
+                android:id="@+id/nav_share"
+                android:icon="@drawable/ic_menu_share"
+                android:title="@string/menu_exit" />
+        </menu>
+    </item>
+
+</menu>

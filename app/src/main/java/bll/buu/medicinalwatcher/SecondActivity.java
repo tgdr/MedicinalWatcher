@@ -7,8 +7,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -16,8 +19,11 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -31,20 +37,23 @@ import java.util.ArrayList;
 import bll.buu.medicinalwatcher.activity.AlarmActivity;
 import bll.buu.medicinalwatcher.activity.CaptureActivity;
 
+import static android.app.Activity.RESULT_OK;
 
-public class SecondActivity extends AppCompatActivity {
+
+public class SecondActivity extends Fragment {
     Button btnlogin;
     Handler myHandler;
     ListView list;
     private Connection connection = null;
     FrameLayout linearLayout;
     LoadingDialog loadingDialog;
-    FloatingActionButton floatingActionButton,floatingActionButton2;
+   // FloatingActionButton floatingActionButton,floatingActionButton2,additemfloatbutton;
     SearchManager searchManager;
+    AddItemActivity addItemDialog;
     SearchView searchView;
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         //处理扫描结果（在界面上显示）
         if (resultCode == RESULT_OK) {
@@ -55,12 +64,12 @@ public class SecondActivity extends AppCompatActivity {
                 public void run() {
                     try {
                      final Bundle getdata =   getItemInfoByBarCode(connection,scanBarCodeResult);
-                        runOnUiThread(new Runnable() {
+                        getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 if(getdata.getString("bar_code")!=null && !getdata.getString("bar_code").equals("")){
 
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(SecondActivity.this);
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                                     builder.setTitle("检索成功！").setMessage("条形码：" + getdata.getString("bar_code") + "\n"
                                             + "药品名称:" + getdata.getString("item_name") + "\n"
                                             + "剩余数量" + getdata.getString("item_count")+"\n"
@@ -70,7 +79,7 @@ public class SecondActivity extends AppCompatActivity {
 
                                 }
                                 else{
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(SecondActivity.this);
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                                     builder.setTitle("系统中无此药品记录").setMessage("没有检索到该条形码对应的药品信息！").show();
                                 }
                             }
@@ -85,16 +94,16 @@ public class SecondActivity extends AppCompatActivity {
         }
     }
 
-
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_search, menu);
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        getActivity().getMenuInflater().inflate(R.menu.menu_search, menu);
         searchManager =
-                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+                (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
         searchView =
                 (SearchView) menu.findItem(R.id.ab_search).getActionView();
         searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(getComponentName()));
+                searchManager.getSearchableInfo(getActivity().getComponentName()));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(final String s) {
@@ -104,10 +113,10 @@ public class SecondActivity extends AppCompatActivity {
                         try {
                             final ArrayList datas= getNamebySymbol(connection,s);
                             if(datas!=null && datas.size()>=1){
-                                runOnUiThread(new Runnable() {
+                                getActivity().runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(SecondActivity.this);
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                                         builder.setTitle("成功获取结果");
                                         builder.setMessage("适用于"+s+"的药物有："+
                                                 datas.toString());
@@ -115,10 +124,10 @@ public class SecondActivity extends AppCompatActivity {
                                     }
                                 });
                             }else{
-                                runOnUiThread(new Runnable() {
+                                getActivity().runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(SecondActivity.this);
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                                         builder.setTitle("没有结果");
                                         builder.setMessage("没有找到适用于"+s
                                                 +"的药物！");
@@ -140,37 +149,25 @@ public class SecondActivity extends AppCompatActivity {
                 return false;
             }
         });
-        return true;
 
     }
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_second);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+        return inflater.inflate(R.layout.activity_second,null);
+    }
 
-        floatingActionButton = findViewById(R.id.floatbutton);
-        floatingActionButton2 = findViewById(R.id.floatbutton2);
-        floatingActionButton2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent it = new Intent(SecondActivity.this, AlarmActivity.class);
-                startActivity(it);
-            }
-        });
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //打开扫描界面扫描条形码或二维码
-                Intent openCameraIntent = new Intent(SecondActivity.this, CaptureActivity.class);
-                startActivityForResult(openCameraIntent, 0);
 
-            }
-        });
-        linearLayout = findViewById(R.id.linear);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        linearLayout = getView().findViewById(R.id.linear);
         linearLayout.setBackgroundResource(R.mipmap.list_bg);
-        list = findViewById(R.id.mylist);
-        loadingDialog = new LoadingDialog(this);
+        list = getView().findViewById(R.id.mylist);
+        loadingDialog = new LoadingDialog(getActivity());
         loadingDialog.show();
         new Thread(new Runnable() {
             @Override
@@ -179,7 +176,7 @@ public class SecondActivity extends AppCompatActivity {
                 try {
                     Class.forName("com.mysql.jdbc.Driver");
                     connection = DriverManager.getConnection("jdbc:mysql://" + AppConfig.serverip + ":3306/workshop?useUnicode=true&characterEncoding=UTF-8&useSSL=false", "root", "091920gwy");
-                   Log.e("连接成功","success");
+                    Log.e("连接成功","success");
                 } catch (ClassNotFoundException e) {
                     // TODO Auto-generated catch block
                     Log.e("连接失败1",e.toString());
@@ -189,51 +186,51 @@ public class SecondActivity extends AppCompatActivity {
                     e1.printStackTrace();
                 }
                 try {
-                   final ArrayList namedata=  getItemName(connection);
-                  runOnUiThread(new Runnable() {
-                      @Override
-                      public void run() {
+                    final ArrayList namedata=  getItemName(connection);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
 
-                          ArrayAdapter adapter = new ArrayAdapter(SecondActivity.this, android.R.layout.simple_list_item_1, namedata);
-                          list.setAdapter(adapter);
-loadingDialog.dismiss();
-                          list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                              @Override
-                              public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
-                                 new Thread(new Runnable() {
-                                     @Override
-                                     public void run() {
-                                         try {
-                                             final String allinfo[] = getItemInfoByItemName(connection,namedata.get(i)+"");
-                                             if(allinfo[0] !=null && !allinfo[0].equals("")){
-                                                 runOnUiThread(new Runnable() {
-                                                     @Override
-                                                     public void run() {
-                                                         AlertDialog.Builder builder = new AlertDialog.Builder(SecondActivity.this);
-                                                         builder.setTitle("成功获取结果");
+                            ArrayAdapter adapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, namedata);
+                            list.setAdapter(adapter);
+                            loadingDialog.dismiss();
+                            list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            try {
+                                                final String allinfo[] = getItemInfoByItemName(connection,namedata.get(i)+"");
+                                                if(allinfo[0] !=null && !allinfo[0].equals("")){
+                                                    getActivity().runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                                            builder.setTitle("成功获取结果");
 
-                                                         builder.setMessage("条形码：" + allinfo[1] + "\n"
-                                                                 + "药品名称:" + allinfo[0] + "\n"
-                                                                 + "剩余数量:" + allinfo[2]+"\n"
-                                                         +"药品到期时间："+allinfo[3]+"\n"
-                                                         +"药物功能："+allinfo[4]);
-                                                         builder.show();
-                                                     }
-                                                 });
-                                             }
-                                         } catch (SQLException e) {
-                                             e.printStackTrace();
-                                         }
-                                     }
-                                 }).start();
+                                                            builder.setMessage("条形码：" + allinfo[1] + "\n"
+                                                                    + "药品名称:" + allinfo[0] + "\n"
+                                                                    + "剩余数量:" + allinfo[2]+"\n"
+                                                                    +"药品到期时间："+allinfo[3]+"\n"
+                                                                    +"药物功能："+allinfo[4]);
+                                                            builder.show();
+                                                        }
+                                                    });
+                                                }
+                                            } catch (SQLException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }).start();
 
-                              }
-                          });
-                      }
-                  });
+                                }
+                            });
+                        }
+                    });
                 } catch (SQLException e) {
                     // TODO Auto-generated catch block
-                    e.printStackTrace();
+                   // e.printStackTrace();
                 }
 
             }
@@ -249,7 +246,7 @@ loadingDialog.dismiss();
                 System.out.println("count" + data.get("item_count").toString());
 
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(SecondActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle("成功获取到扫描结果");
                 builder.setMessage("条形码：" + data.get("bar_code").toString() + "\n"
                         + "名称" + data.get("item_name").toString() + "\n"
@@ -258,7 +255,9 @@ loadingDialog.dismiss();
             }
         };
 
+
     }
+
 
 
     public Bundle getItemInfoByBarCode(Connection con1, String barcode) throws SQLException {
